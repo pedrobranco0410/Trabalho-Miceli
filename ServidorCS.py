@@ -24,7 +24,7 @@ clients = {}
 print(f'Listening for connections on :{PORT}...')
 #Apos cada print, as informacoes serao registradas no arquivo de texto
 reg.write(u'Aguardando conexão' + '\n')
-
+reg.close()
 #Função criada para receber as mensagens dos clientes
 def receive_message(client_socket):
 
@@ -67,9 +67,10 @@ while True:
             sockets_list.append(client_socket)
             clients[client_socket] = user
 
+            reg = open('message_log.txt', 'a+')
             print('Accepted new connection from {}:{}, username: {}'.format(*client_address, user['data'].decode('utf8')))
-            reg.write('Accepted new connection from {}:{}, username: {}'.format(*client_address, user['data'].decode('utf8')))
-
+            reg.write('Accepted new connection from {}:{}, username: {}'.format(*client_address, user['data'].decode('utf8'))+ '\n')
+            reg.close()
         
         else:
 
@@ -78,17 +79,20 @@ while True:
 
             #Verificando se o usuário foi desconectado e, se tiver sido desconectado, excluindo ele da lista
             if message is False:
+                reg = open('message_log.txt', 'a+')
                 print('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8')))
-                reg.write('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8')))
+                reg.write('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8'))+ '\n')
+                reg.close()
                 sockets_list.remove(notified_socket)
                 del clients[notified_socket]
                 continue
 
             #Econtrando o nome de usuário de quem enviou a mensagem
             user = clients[notified_socket]
+            reg = open('message_log.txt', 'a+')
             print(f'Received message from {user["data"]}: {message["data"].decode("utf-8")}')
-            reg.write(f'Received message from {user["data"]}: {message["data"].decode("utf-8")}')
-
+            reg.write(f'Received message from {user["data"]}: {message["data"].decode("utf-8")}'+ '\n')
+            reg.close()
             #Reenviando a mensagem recebida para todos os outros clientes conectados ao servidor
             for client_socket in clients:
                 if client_socket != notified_socket:
@@ -96,11 +100,13 @@ while True:
                     
     #Verificando se o usuário foi desconectado e, se tiver sido desconectado, excluindo ele da lista
     for notified_socket in exception_sockets:
+        reg = open('message_log.txt', 'a+')
         print('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8')))
-        reg.write('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8')))
+        reg.write('Closed connection from: {}'.format(clients[notified_socket]['data'].decode('utf-8'))+ '\n')
+        reg.close()
         sockets_list.remove(notified_socket)
         del clients[notified_socket]
         
-reg.write('Servidor encerrado')
-reg.close()
-server_socket.close()
+
+
+

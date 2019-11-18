@@ -21,7 +21,7 @@ def GetUdpChatMessage():
         username = recved[HEADER_LENGTH:HEADER_LENGTH+username_length]
                    
         # m - mensagem
-        if username[:1] == 'm':
+        if username[:1] == 'm' and username[1:]!= name:
            
            message_header =recved[HEADER_LENGTH+username_length:HEADER_LENGTH+username_length+HEADER_LENGTH]
            #Verificando se a mensagem recebida não está vazia
@@ -30,10 +30,10 @@ def GetUdpChatMessage():
            message_length = int(message_header.strip())
            message = recved[HEADER_LENGTH+username_length+HEADER_LENGTH:HEADER_LENGTH+username_length+HEADER_LENGTH+message_length]
 
-           print( username[1:] + ">>" + message)
+           print( username[1:] + ">>" + message+'\n')
 
         #o - mensagem avisando que o usuário está na rede   
-        elif username[:1] == 'o':
+        elif username[:1] == 'o' and username[1:]!= name:
           
            if not(username[1:] in current_online):
              current_online.append(username[1:])
@@ -42,10 +42,10 @@ def GetUdpChatMessage():
              
         #s - mensagem avisando saída da rede     
         elif username[:1] == 's':
-           if (user[1:] in current_online):
+           if (username[1:] in current_online):
              current_online.remove(username[1:])
              print("***User disconnected: " + username[1:] + "***")
-             print('***Total Online User: ' + str(len(current_online))+"***")
+             print('***Total Online User: ' + str(len(current_online))+"***"+'\n')
 
 #Função responsável por enviar as mensagens
 def SendBroadcastMessageForChat():
@@ -78,11 +78,13 @@ def SendBroadcastOnlineStatus():
     global name
     global sendSocket
     sendSocket.setblocking(False)
+    
     username =  ('o'+name).encode('utf-8')
     username_header = f"{len(username):<{HEADER_LENGTH}}".encode('utf-8')
     while True:                             
         time.sleep(1)
         #Enviando o nome do usuário
+        print('o'+name)
         sendSocket.sendto(username_header+username, ('255.255.255.255', 2000))  
 
 
